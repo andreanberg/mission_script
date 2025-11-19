@@ -2,7 +2,7 @@ import numpy as np
 import time
 import os
 
-from core.scrape import get_cl_cd
+from scrape import get_cl_cd
 
 class Drone:
     def __init__(

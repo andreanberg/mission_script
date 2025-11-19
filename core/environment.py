@@ -1,6 +1,6 @@
 import numpy as np
 
-from core.drone import Drone
+from drone import Drone
 
 
 class Env:

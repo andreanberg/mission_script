@@ -1,8 +1,8 @@
 import numpy as np
 import time
 
-from core.drone import Drone
-from core.environment import Env
+from drone import Drone
+from environment import Env
 
 class Sim:
     def __init__(self, drone: Drone, env: Env, dt=0.1):
