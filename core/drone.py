@@ -2,7 +2,7 @@ import numpy as np
 import time
 import os
 
-from prop.scrape import get_cl_cd
+from core.scrape import get_cl_cd
 
 class Drone:
     def __init__(
@@ -80,7 +80,8 @@ class Drone:
     def required_cl_for_level(self):
         x,y = self.v_norm 
         angle = np.atan2(y,x)
-        cl, cd, used_speed, used_file = get_cl_cd(self.v_body, angle)
+        v_abs = np.linalg.norm(self.v_body)
+        cl, cd, used_speed, used_file = get_cl_cd(v_abs, angle)
 
         print("Using file:", used_file)
         print("File speed:", used_speed)

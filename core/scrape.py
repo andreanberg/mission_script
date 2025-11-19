@@ -2,11 +2,8 @@ import os
 import re
 import numpy as np
 
-# Folder containing this file (prop/)
-THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-
 # Folder with the XFLR value files
-POLAR_FOLDER = os.path.join(THIS_DIR, "XFLR_Values")
+POLAR_FOLDER = "prop"
 
 
 def parse_speed_from_filename(filename):
@@ -83,3 +80,11 @@ def get_cl_cd(speed, alpha):
     cd = np.interp(alpha, alphas, cds)
 
     return cl, cd, best_speed, best_file
+
+# se till att förstå detta scriptet bra
+
+cl, cd, used_speed, used_file = get_cl_cd(1, 0)
+print("Using file:", used_file)
+print("File speed:", used_speed)
+print("CL =", cl)
+print("CD =", cd)
