@@ -1,8 +1,8 @@
 import numpy as np
 
-from drone import Drone
-from environment import Env
-from simulator import Sim, Takeoff
+from core.drone import Drone
+from core.environment import Env
+from core.simulator import Sim, Takeoff
 
 
 if __name__ == "__main__":

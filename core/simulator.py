@@ -1,9 +1,8 @@
-from drone import Drone
-from environment import Env
-
 import numpy as np
 import time
 
+from core.drone import Drone
+from core.environment import Env
 
 class Sim:
     def __init__(self, drone: Drone, env: Env, dt=0.1):
@@ -28,7 +27,7 @@ class Takeoff:
         while not drone.takeoff and drone.pos[0] < self.runaway_length:
             time.sleep(0.1)
 
-            cl_req = drone.required_cl_for_level(sim.env.rho)
+            cl_req = drone.required_cl_for_level()
             force_vec = drone.compute_forces(sim.env.rho, cl_req)
             drone.take_physics_step(sim.env, force_vec, sim.dt, cl_req)
 

@@ -1,6 +1,8 @@
 import numpy as np
 import time
+import os
 
+from prop.scrape import get_cl_cd
 
 class Drone:
     def __init__(
@@ -75,17 +77,18 @@ class Drone:
         # from other (dummy) - simon brask må veta vilken thrust
         return self.thrust_max * self.v_norm
 
-    def required_cl_for_level(self, rho):
-        v_abs = np.linalg.norm(self.v_body)
-        
-        # cl(alpha) / cd(alpha) - funktion av alpha   
-        
-        # at low speed, use set value
-        if v_abs < 5.0:
-            return 0.0
-        else:
-            return 2.0 * np.linalg.norm(self.weight) / (rho * v_abs**2 * self.wing_area)
+    def required_cl_for_level(self):
+        x,y = self.v_norm 
+        angle = np.atan2(y,x)
+        cl, cd, used_speed, used_file = get_cl_cd(self.v_body, angle)
 
+        print("Using file:", used_file)
+        print("File speed:", used_speed)
+        print("CL =", cl)
+        print("CD =", cd)
+        
+        return cl
+    
     def power_required(self, rho, cl):
         if self.v_low:
             return 0.0
