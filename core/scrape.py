@@ -82,9 +82,3 @@ def get_cl_cd(speed, alpha):
     return cl, cd, best_speed, best_file
 
 # se till att förstå detta scriptet bra
-
-cl, cd, used_speed, used_file = get_cl_cd(1, 0)
-print("Using file:", used_file)
-print("File speed:", used_speed)
-print("CL =", cl)
-print("CD =", cd)

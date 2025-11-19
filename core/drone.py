@@ -66,7 +66,16 @@ class Drone:
 
     def drag_vec(self, rho, cl):
         # from openvsp
-        cd = self.cd0 + self.k_induced * cl**2
+        #cd = self.cd0 + self.k_induced * cl**2
+        x,y = self.v_norm 
+        angle = np.atan2(y,x)
+        v_abs = np.linalg.norm(self.v_body)
+        cl, cd, used_speed, used_file = get_cl_cd(v_abs, angle) 
+        print("cd", cd)
+        
+        # we could do a drone-wide update of these values 
+        # removing the need to check it every time
+        
         v_abs = np.linalg.norm(self.v_body)
         if self.v_low:
             return np.zeros(2)
@@ -81,13 +90,11 @@ class Drone:
         x,y = self.v_norm 
         angle = np.atan2(y,x)
         v_abs = np.linalg.norm(self.v_body)
-        cl, cd, used_speed, used_file = get_cl_cd(v_abs, angle)
-
-        print("Using file:", used_file)
-        print("File speed:", used_speed)
-        print("CL =", cl)
-        print("CD =", cd)
-        
+        cl, cd, used_speed, used_file = get_cl_cd(v_abs, angle) 
+        print("cl", cl)
+        # we could do a drone-wide update of these values 
+        # removing the need to check it every time
+               
         return cl
     
     def power_required(self, rho, cl):
