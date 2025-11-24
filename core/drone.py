@@ -13,12 +13,14 @@ class Drone:
         wing_area=0.8,
         thrust=150.0,
         battery_capacity_wh=500.0,
+        debug = False
     ):
         self.mass = mass
         self.v_thresh = v_thresh
         self.wing_area = wing_area
         self.thrust_max = thrust
         self.battery_capacity_wh = battery_capacity_wh
+        self.debug = debug
 
         self.reset()
 
@@ -31,6 +33,8 @@ class Drone:
         self.takeoff = False
         self.climbed = False
         self.cruised = False
+        
+        return self
 
     def update_values(self, rho):
         x, y = self.v_norm
@@ -104,8 +108,7 @@ class Drone:
         thrust_vec = self.thrust_vec()
         weight_vec = self.weight
 
-        debug = True
-        if debug:
+        if self.debug:
             time.sleep(0.1)
             print("lift_vec\t", lift_vec)
             print("drag_vec\t", drag_vec)
