@@ -6,11 +6,11 @@ from simulator import Sim, Takeoff
 
 
 if __name__ == "__main__":
-    env = Env(air_density=1.225)
     drone = Drone(mass=6.0, wing_area=0.9, thrust=50.0)
+    env = Env(air_density=1.225)
     sim = Sim(drone, env, dt=0.01)
 
-    to = sim.run(Takeoff(runaway_length=100))
+    to = sim.run(Takeoff(runaway_length=20))
     
     print(f"Takeoff finished: \n{drone.t:.1f}\n")
     print(f"pos \n{np.round(drone.pos,3)}\n")

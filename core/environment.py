@@ -29,5 +29,5 @@ class Env:
     def constrain_acc(self, drone, acc):
         """Modify acc if drone is constrained to ground"""
         if drone.pos[1] <= 0.0 and not drone.takeoff:
-            acc[1] = 0.0  # No vertical acc on ground
+            acc[1] = max(0.0, acc[1])  # No vertical acc on ground
         return acc

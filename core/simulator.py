@@ -25,11 +25,8 @@ class Takeoff:
         drone.takeoff = False
 
         while not drone.takeoff and drone.pos[0] < self.runaway_length:
-            time.sleep(0.1)
-
-            cl_req = drone.required_cl_for_level()
-            force_vec = drone.compute_forces(sim.env.rho, cl_req)
-            drone.take_physics_step(sim.env, force_vec, sim.dt, cl_req)
+            force_vec = drone.compute_forces(sim.env.rho)
+            drone.step(sim.env, force_vec, sim.dt)
 
             if force_vec[1] >= 0:
                 drone.takeoff = True

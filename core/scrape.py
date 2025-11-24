@@ -80,5 +80,3 @@ def get_cl_cd(speed, alpha):
     cd = np.interp(alpha, alphas, cds)
 
     return cl, cd, best_speed, best_file
-
-# se till att förstå detta scriptet bra
