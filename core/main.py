@@ -1,5 +1,6 @@
 import numpy as np
 
+from debug import Debugger
 from drone import Drone
 from environment import Env
 from simulator import Sim, Takeoff, Climb

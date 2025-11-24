@@ -2,6 +2,7 @@ import numpy as np
 import time
 import os
 
+from debug import Debugger
 from scrape import get_cl_cd
 
 
@@ -38,7 +39,7 @@ class Drone:
 
     def update_values(self, rho):
         x, y = self.v_norm
-        angle = np.atan2(y, x)
+        angle = np.arctan2(y, x)
         v_abs = np.linalg.norm(self.v_body)
         cl, cd, _, _ = get_cl_cd(v_abs, angle)
         self.rho = rho
