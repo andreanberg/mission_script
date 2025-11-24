@@ -2,7 +2,7 @@ import numpy as np
 
 from drone import Drone
 
-# this one should only be a functionz not two functions
+# this one should only be a functions, not two functions
 
 
 
