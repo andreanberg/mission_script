@@ -2,10 +2,6 @@ import os
 import re
 import numpy as np
 
-# Folder with the XFLR value files
-POLAR_FOLDER = "prop"
-
-
 def parse_speed_from_filename(filename):
     """
     Extract speed from filenames like:
@@ -45,17 +41,17 @@ def load_polar_file(path):
     return np.array(alphas), np.array(cls), np.array(cds)
 
 
-def get_cl_cd(speed, alpha):
+def get_cl_cd(speed, alpha, folder="prop"):
     """
     Returns interpolated CL and CD for the given (speed, alpha).
 
     - Finds the file whose encoded speed is closest to `speed`
     - Loads and interpolates over alpha
     """
-    if not os.path.isdir(POLAR_FOLDER):
-        raise RuntimeError(f"Polar folder not found: {POLAR_FOLDER}")
+    if not os.path.isdir(folder):
+        raise RuntimeError(f"Polar folder not found: {folder}")
 
-    files = [f for f in os.listdir(POLAR_FOLDER) if f.endswith(".txt")]
+    files = [f for f in os.listdir(folder) if f.endswith(".txt")]
 
     speed_map = {}
     for f in files:
@@ -70,7 +66,7 @@ def get_cl_cd(speed, alpha):
     best_file = min(speed_map, key=lambda fn: abs(speed_map[fn] - speed))
     best_speed = speed_map[best_file]
 
-    path = os.path.join(POLAR_FOLDER, best_file)
+    path = os.path.join(folder, best_file)
     alphas, cls, cds = load_polar_file(path)
 
     if len(alphas) == 0:
