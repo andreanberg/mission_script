@@ -14,7 +14,7 @@ class Drone:
         wing_area=0.8,
         thrust=150.0,
         battery_capacity_wh=500.0,
-        debug = False
+        debug=False,
     ):
         self.mass = mass
         self.v_thresh = v_thresh
@@ -34,7 +34,7 @@ class Drone:
         self.takeoff = False
         self.climbed = False
         self.cruised = False
-        
+
         return self
 
     def update_values(self, rho):
@@ -62,6 +62,10 @@ class Drone:
     @property
     def v_low(self):
         return np.linalg.norm(self.v_body) < self.v_thresh
+    
+    @property
+    def thrust(self):
+        return self.thrust_max
 
     def lift_vec(self):
         v_abs = np.linalg.norm(self.v_body)
@@ -83,8 +87,12 @@ class Drone:
         return -drag_abs * self.v_norm
 
     def thrust_vec(self):
+        # den här är helt fel, man borde ha en vinkel på planet och helt 
+        # separat planets hastighet, det är ju möjligt att inte åka helt i 
+        # linje med planet
+        
         # from other (dummy) - simon brask må veta vilken thrust
-        return self.thrust_max * self.v_norm
+        return self.thrust * self.v_norm
 
     def power_required(self):
         if self.v_low:
@@ -119,6 +127,7 @@ class Drone:
     def step(self, env, force_vec, dt):
         self.v_body += force_vec / self.mass * dt
         env.ground_constraint(self)
+        # env.climb_constraint(self) TODO 
         self.pos += self.v_body * dt
         self.t += dt
         power = self.power_required()

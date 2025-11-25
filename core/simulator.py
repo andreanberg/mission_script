@@ -5,6 +5,8 @@ from debug import Debugger
 from drone import Drone
 from environment import Env
 
+# TODO, work through and understand the role of kwargs 
+# and if that is worth your time
 
 class Sim:
     def __init__(self, drone: Drone, env: Env, dt=0.1):
