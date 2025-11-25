@@ -32,7 +32,7 @@ def main():
     run([str(pip_path), "install", "--upgrade", "pip"])
     run([str(pip_path), "install", "-r", str(root / "requirements.txt")])
 
-    print(f"\n\n\nVirtual environment created at:")
+    print(f"\n\nVirtual environment created at:")
     print(f"{Color.CYAN}{venv_dir}{Color.RESET}")
     print("\nTo activate it, run the following in terminal:")
 

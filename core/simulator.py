@@ -1,6 +1,7 @@
 import numpy as np
 import time
 
+from debug import Debugger
 from drone import Drone
 from environment import Env
 
@@ -21,8 +22,8 @@ class Mission:
         pass
 
 class Takeoff:
-    def __init__(self, runaway_length):
-        self.runaway_length = runaway_length
+    def __init__(self, runway_length):
+        self.runaway_length = runway_length
 
     def run(self, sim: Sim):
         drone = sim.drone
@@ -35,6 +36,11 @@ class Takeoff:
             if force_vec[1] >= 0:
                 drone.takeoff = True
         return self
+    
+    def simulate_condition(self):
+        pass
+    def success_check(self):
+        pass
 
 
 class Climb:
