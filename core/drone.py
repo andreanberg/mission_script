@@ -117,10 +117,9 @@ class Drone:
         return lift_vec + drag_vec + thrust_vec + weight_vec
 
     def step(self, env, force_vec, dt):
-        a_acc = env.constrain_acc(self, force_vec / self.mass)
-        self.v_body += a_acc * dt
+        self.v_body += force_vec / self.mass * dt
+        env.ground_constraint(self)
         self.pos += self.v_body * dt
-        env.apply_ground_constraint(self)
         self.t += dt
         power = self.power_required()
         self.consume_energy(power, dt)

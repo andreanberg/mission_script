@@ -2,11 +2,8 @@ import os
 import re
 import numpy as np
 
-def parse_speed_from_filename(filename):
-    """
-    Extract speed from filenames like:
-    'CAT V2_T1-15_5 m_s-VLM1.txt'
-    """
+
+def file_speed(filename):
     match = re.search(r"(\d+[.,_]\d+)\s*m[_ ]s", filename)
     if not match:
         return None
@@ -15,14 +12,8 @@ def parse_speed_from_filename(filename):
     return float(number)
 
 
-def load_polar_file(path):
-    """
-    Reads an XFLR5 VLM polar file and extracts:
-
-    alpha, CL, CD (total)
-    """
+def load_file(path):
     alphas, cls, cds = [], [], []
-
     with open(path, "r") as f:
         for line in f:
             parts = line.split()
@@ -37,38 +28,29 @@ def load_polar_file(path):
                 cds.append(Cd)
             except ValueError:
                 continue
-
     return np.array(alphas), np.array(cls), np.array(cds)
 
 
 def get_cl_cd(speed, alpha, folder="prop"):
-    """
-    Returns interpolated CL and CD for the given (speed, alpha).
-
-    - Finds the file whose encoded speed is closest to `speed`
-    - Loads and interpolates over alpha
-    """
     if not os.path.isdir(folder):
-        raise RuntimeError(f"Polar folder not found: {folder}")
-
+        raise RuntimeError(f"Folder not found: {folder}")
     files = [f for f in os.listdir(folder) if f.endswith(".txt")]
-
     speed_map = {}
     for f in files:
-        s = parse_speed_from_filename(f)
+        s = file_speed(f)
         if s is not None:
             speed_map[f] = s
 
     if not speed_map:
-        raise RuntimeError("No valid speed-encoded files found in XFLR_Values.")
+        raise RuntimeError("No valid speed-encoded files found.")
 
     # snap to closest speed
     best_file = min(speed_map, key=lambda fn: abs(speed_map[fn] - speed))
     best_speed = speed_map[best_file]
-
+    
     path = os.path.join(folder, best_file)
-    alphas, cls, cds = load_polar_file(path)
-
+    alphas, cls, cds = load_file(path)
+    
     if len(alphas) == 0:
         raise RuntimeError(f"No aerodynamic data found in: {path}")
 
