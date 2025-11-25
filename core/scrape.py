@@ -41,7 +41,7 @@ def load_polar_file(path):
     return np.array(alphas), np.array(cls), np.array(cds)
 
 
-def get_cl_cd(speed, alpha, folder="mission_script/prop"):
+def get_cl_cd(speed, alpha, folder="prop"):
     """
     Returns interpolated CL and CD for the given (speed, alpha).
 

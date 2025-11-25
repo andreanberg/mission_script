@@ -76,10 +76,6 @@ class Drone:
         return lift_abs * lift_dir
 
     def drag_vec(self):
-        # from openvsp
-        # we could do a drone-wide update of these values
-        # removing the need to check it every time
-
         v_abs = np.linalg.norm(self.v_body)
         if self.v_low:
             return np.zeros(2)
