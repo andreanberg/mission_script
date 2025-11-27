@@ -82,30 +82,3 @@ class Takeoff(Mission):
 
     def on_end(self, sim: Sim):
         print("Takeoff successful.")
-
-
-class Climb(Mission):
-    """
-    Climb mission. Requires:
-        climb_angle =
-        target_altitude
-    """
-
-    def __init__(self, climb_angle, target_altitude, **kwargs):
-        super().__init__(
-            climb_angle=climb_angle, target_altitude=target_altitude, **kwargs
-        )
-        self.climbed = False
-
-    def simulate_condition(self, sim: Sim):
-        return not self.climbed
-
-    def success_check(self, sim: Sim):
-        drone = sim.drone
-        if drone.pos[1] >= self.ctx["target_altitude"]:
-            self.climbed = True
-            return True
-        return False
-
-    def on_end(self, sim):
-        print("Climb complete.")
