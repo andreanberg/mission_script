@@ -20,6 +20,9 @@ class Debugger:
         if self.show:
             print(self.data)
 
+    def override_show_data(self):
+        print(self.data)
+
 
 """
 if self.debug:
