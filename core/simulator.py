@@ -5,8 +5,9 @@ from debug import Debugger
 from drone import Drone
 from environment import Env
 
-# TODO, work through and understand the role of kwargs 
+# TODO, work through and understand the role of kwargs
 # and if that is worth your time
+
 
 class Sim:
     def __init__(self, drone: Drone, env: Env, dt=0.1):
@@ -19,52 +20,42 @@ class Sim:
 
 
 class Mission:
-    """
-    Base Mission class with optional context (kwargs).
-    Subclasses override simulate_condition and success_check
-    to define their behavior.
-    """
+    def __init__(self, debugger: Debugger | None = None):
+        if debugger != None:
+            self.debugger = debugger
 
-    def __init__(self, **kwargs):
-        # Mission context storage (all user-defined mission parameters)
-        self.ctx = kwargs
-
-    def on_start(self, sim):
-        """Hook called before the mission loop begins."""
+    def on_start(self, sim: Sim):
         pass
 
-    def on_step(self, sim):
-        """Hook called after each simulation step."""
+    def on_step(self, sim: Sim):
         pass
 
-    def on_end(self, sim):
-        """Hook called after mission success."""
+    def on_end(self, sim: Sim):
         pass
 
-    # ---- REQUIRED: Subclasses override these ----
-    def simulate_condition(self, sim):
-        """
-        Returns True if the simulation loop should continue.
-        """
+    def simulate_condition(self, sim: Sim):
         raise NotImplementedError
 
-    def success_check(self, sim):
-        """
-        Returns True when the mission has succeeded.
-        """
+    def success_check(self, sim: Sim):
         raise NotImplementedError
 
-    # ---- Generic runner ----
+    def log(self, drone: Drone):
+        if self.debugger != None:
+            self.debugger.get_data(drone)
+
     def run(self, sim: Sim):
         self.on_start(sim)
-
+        drone = sim.drone
+        self.log(drone)
         while self.simulate_condition(sim):
-            drone = sim.drone
             force_vec = drone.compute_forces(sim.env.rho)
             drone.step(sim.env, force_vec, sim.dt)
             self.on_step(sim)
+            self.log(drone)
 
             if self.success_check(sim):
+                if self.debugger != None:
+                    self.debugger.show_data()
                 break
 
         self.on_end(sim)
@@ -72,27 +63,20 @@ class Mission:
 
 
 class Takeoff(Mission):
-    """
-    Takeoff mission. Requires:
-        runway_length
-    """
+    def __init__(self, runway_length, debugger: Debugger | None = None):
+        super().__init__(debugger=debugger)
+        self.runway_length = runway_length
 
-    def __init__(self, runway_length, **kwargs):
-        super().__init__(runway_length=runway_length, **kwargs)
-
-    # Required overrides --------------------------------
     def simulate_condition(self, sim: Sim):
         drone = sim.drone
-        return (not drone.takeoff) and (drone.pos[0] < self.ctx["runway_length"])
+        return (not drone.takeoff) and (drone.pos[0] < self.runway_length)
 
     def success_check(self, sim: Sim):
-        drone = sim.drone
-        if drone.compute_forces(sim.env.rho)[1] >= 0:  # lift >= weight
-            drone.takeoff = True
+        if sim.drone.compute_forces(sim.env.rho)[1] >= 0:
+            sim.drone.takeoff = True
             return True
         return False
 
-    # Optional hooks ------------------------------------
     def on_start(self, sim: Sim):
         sim.drone.takeoff = False
 

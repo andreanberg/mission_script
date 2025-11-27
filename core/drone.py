@@ -1,8 +1,6 @@
 import numpy as np
 import time
 import os
-
-from debug import Debugger
 from scrape import get_cl_cd
 
 
@@ -14,15 +12,12 @@ class Drone:
         wing_area=0.8,
         thrust=150.0,
         battery_capacity_wh=500.0,
-        debug=False,
     ):
         self.mass = mass
         self.v_thresh = v_thresh
         self.wing_area = wing_area
         self.thrust_max = thrust
         self.battery_capacity_wh = battery_capacity_wh
-        self.debug = debug
-
         self.reset()
 
     def reset(self):
@@ -62,7 +57,7 @@ class Drone:
     @property
     def v_low(self):
         return np.linalg.norm(self.v_body) < self.v_thresh
-    
+
     @property
     def thrust(self):
         return self.thrust_max
@@ -87,10 +82,10 @@ class Drone:
         return -drag_abs * self.v_norm
 
     def thrust_vec(self):
-        # den här är helt fel, man borde ha en vinkel på planet och helt 
-        # separat planets hastighet, det är ju möjligt att inte åka helt i 
+        # den här är helt fel, man borde ha en vinkel på planet och helt
+        # separat planets hastighet, det är ju möjligt att inte åka helt i
         # linje med planet
-        
+
         # from other (dummy) - simon brask må veta vilken thrust
         return self.thrust * self.v_norm
 
@@ -102,32 +97,21 @@ class Drone:
         return power_shaft
 
     def consume_energy(self, power_w, dt):
-        wh_used = (power_w * dt) / 3600.0
-        self.battery_wh = max(0.0, self.battery_wh - wh_used)
-        return wh_used
+        self.wh_used = (power_w * dt) / 3600.0
+        self.battery_wh = max(0.0, self.battery_wh - self.wh_used)
+        return self.wh_used
 
     def compute_forces(self, rho):
         self.update_values(rho)
-        lift_vec = self.lift_vec()
-        drag_vec = self.drag_vec()
-        thrust_vec = self.thrust_vec()
-        weight_vec = self.weight
-
-        if self.debug:
-            time.sleep(0.1)
-            print("lift_vec\t", lift_vec)
-            print("drag_vec\t", drag_vec)
-            print("thrust_vec\t", thrust_vec)
-            print("weight_vec\t", weight_vec)
-            print("pos\t\t", self.pos)
-            print()
-
-        return lift_vec + drag_vec + thrust_vec + weight_vec
+        self.li_vec, self.dr_vec = self.lift_vec(), self.drag_vec()
+        self.th_vec, self.w_vec = self.thrust_vec(), self.weight
+        self.f_vec = self.li_vec + self.dr_vec + self.th_vec + self.w_vec
+        return self.f_vec
 
     def step(self, env, force_vec, dt):
         self.v_body += force_vec / self.mass * dt
         env.ground_constraint(self)
-        # env.climb_constraint(self) TODO 
+        # env.climb_constraint(self) TODO
         self.pos += self.v_body * dt
         self.t += dt
         power = self.power_required()

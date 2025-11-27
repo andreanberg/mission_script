@@ -62,8 +62,8 @@ def get_cl_cd(speed, alpha, folder="prop/aero"):
 
 # TODO make this readible and read from it
 
-file = "prop/motor/testParameter_AT4125 VTOL Fixed Wing Aircraft Long Shaft Motor KV250_KV540.xls"
-df = pd.read_excel(file, engine="xlrd")
+#file = "prop/motor/testParameter_AT4125 VTOL Fixed Wing Aircraft Long Shaft Motor KV250_KV540.xls"
+#df = pd.read_excel(file, engine="xlrd")
 
 """
 # If xlrd is not available, convert your file to .xlsx manually,
