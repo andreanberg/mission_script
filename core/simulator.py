@@ -81,4 +81,8 @@ class Takeoff(Mission):
         sim.drone.takeoff = False
 
     def on_end(self, sim: Sim):
-        print("Takeoff successful.")
+        drone = sim.drone
+        print(f"Takeoff finished: \n{drone.t:.1f}\n")
+        print(f"pos \n{np.round(drone.pos,3)}\n")
+        print(f"v \n{np.linalg.norm(drone.v_body):.2f} m/s\n")
+        print(f"takeoff \n{drone.takeoff}\n")

@@ -32,7 +32,7 @@ def load_file(path):
     return np.array(alphas), np.array(cls), np.array(cds)
 
 
-def get_cl_cd(speed, alpha, folder="prop/aero"):
+def get_cl_cd(speed, alpha, folder="aero"):
     if not os.path.isdir(folder):
         raise RuntimeError(f"Folder not found: {folder}")
     files = [f for f in os.listdir(folder) if f.endswith(".txt")]
