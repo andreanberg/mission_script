@@ -8,7 +8,6 @@ class Debugger:
     def __init__(self, args=None):
         self.data = []
         self.args = args
-        self.flatten = np.array(args).flatten()
 
     def get_data(self, drone: Drone):
         self.drone = drone
@@ -16,29 +15,33 @@ class Debugger:
             timedict = drone.__dict__
         else:
             timedict = {}
-            for key in self.flatten:
-                timedict[key] = drone.__dict__[key]
+            for key in self.args:
+                if np.shape(key) == (2,):
+                    di = drone.__dict__
+                    timedict[key] = (di[key[0]], di[key[1]])
+                elif np.shape(key) == ():
+                    timedict[key] = drone.__dict__[key]
+                else:
+                    raise ValueError(f'Key "{key}" incorrect shape')
         self.data.append(timedict)
 
     def format(self):
         self.table = {}
-        re = self.drone.__dict__ if self.args == None else self.flatten
+        re = self.drone.__dict__ if self.args == None else self.args
         for key in re:
             self.table[key] = np.array([d[key] for d in self.data])
 
     def show_data(self):
         self.format()
-        plt.figure()
-        if self.args == None:
-            pass
-        else:
-            print(self.args)
-            for x_name, y_name in self.args:
-                plt.plot(
-                    self.table[x_name],
-                    self.table[y_name],
-                    label=f"{y_name} vs {x_name}",
-                )
+        if self.args != None:
+            plt.figure()
+            for key in self.args:
+                if np.shape(key) == (2,) or np.shape(key) == ():
+                    x, y = self.table[key]
+                    label = f"test"
+                else:
+                    raise ValueError(f'Key "{key}" incorrect shape')
+                plt.plot(x, y, label=label)
             plt.legend()
             plt.xlabel("x")
             plt.ylabel("y")

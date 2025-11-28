@@ -60,5 +60,3 @@ def get_cl_cd(speed, alpha, folder="../prop/aero"):
     cd = np.interp(alpha, alphas, cds)
 
     return cl, cd, best_speed, best_file
-
-# TODO make this readible and read from it
