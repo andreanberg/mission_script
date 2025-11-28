@@ -54,8 +54,6 @@ class Mission:
             self.log(drone)
 
             if self.success_check(sim):
-                if self.debugger != None:
-                    self.debugger.show_data()
                 break
 
         self.on_end(sim)
@@ -79,10 +77,3 @@ class Takeoff(Mission):
 
     def on_start(self, sim: Sim):
         sim.drone.takeoff = False
-
-    def on_end(self, sim: Sim):
-        drone = sim.drone
-        print(f"Takeoff finished: \n{drone.t:.1f}\n")
-        print(f"pos \n{np.round(drone.pos,3)}\n")
-        print(f"v \n{np.linalg.norm(drone.v_body):.2f} m/s\n")
-        print(f"takeoff \n{drone.takeoff}\n")

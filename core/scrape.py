@@ -32,7 +32,8 @@ def load_file(path):
     return np.array(alphas), np.array(cls), np.array(cds)
 
 
-def get_cl_cd(speed, alpha, folder="prop/aero"):
+def get_cl_cd(speed, alpha, folder="../prop/aero"):
+    folder = os.getcwd() + '/' + folder
     if not os.path.isdir(folder):
         raise RuntimeError(f"Folder not found: {folder}")
     files = [f for f in os.listdir(folder) if f.endswith(".txt")]
@@ -61,41 +62,3 @@ def get_cl_cd(speed, alpha, folder="prop/aero"):
     return cl, cd, best_speed, best_file
 
 # TODO make this readible and read from it
-
-#file = "prop/motor/testParameter_AT4125 VTOL Fixed Wing Aircraft Long Shaft Motor KV250_KV540.xls"
-#df = pd.read_excel(file, engine="xlrd")
-
-"""
-# If xlrd is not available, convert your file to .xlsx manually,
-# then simply use:
-# df = pd.read_excel("motor_test.xlsx")
-
-# --- Clean column names (optional but recommended) ---
-df.columns = df.columns.str.strip()
-
-# --- Extract arrays ---
-throttle_pct = df["Throttle"].str.replace("%", "").astype(float).values  
-voltage      = df["Voltage (V)"].astype(float).values
-current      = df["Current (A)"].astype(float).values
-power        = df["Power (W)"].astype(float).values
-rpm          = df["RPM"].astype(float).values
-thrust_g     = df["Thrust (g)"].astype(float).values
-
-# Convert thrust to Newtons
-thrust_N = thrust_g * 9.81 / 1000.0
-
-# --- Optional interpolation functions ---
-throttle_norm = throttle_pct / 100.0
-
-thrust_fn  = lambda t: np.interp(t, throttle_norm, thrust_N)
-power_fn   = lambda t: np.interp(t, throttle_norm, power)
-rpm_fn     = lambda t: np.interp(t, throttle_norm, rpm)
-
-# Print summaries
-print("Throttle (%):", throttle_pct)
-print("Thrust (N):", thrust_N)
-print("RPM:", rpm)
-print("Power (W):", power)
-print("Voltage:", voltage)
-print("Current:", current)
-"""
