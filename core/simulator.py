@@ -49,8 +49,11 @@ class Mission:
             drone.step(sim.env, force_vec, sim.dt)
             self.on_step(sim)
             self.log(drone)
+            print(self.debugger.data[-3:-1], "\n")
 
             if self.success_check(sim):
+                #print()
+                #print(self.debugger.data[-10:-5])
                 break
 
         self.on_end(sim)

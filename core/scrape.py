@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import xlrd
 
+
 def file_speed(filename):
     match = re.search(r"(\d+[.,_]\d+)\s*m[_ ]s", filename)
     if not match:
@@ -32,8 +33,8 @@ def load_file(path):
     return np.array(alphas), np.array(cls), np.array(cds)
 
 
-def get_cl_cd(speed, alpha, folder="../prop/aero"):
-    folder = os.getcwd() + '/' + folder
+def get_cl_cd(speed, alpha, folder):
+    folder = os.getcwd() + "/" + folder
     if not os.path.isdir(folder):
         raise RuntimeError(f"Folder not found: {folder}")
     files = [f for f in os.listdir(folder) if f.endswith(".txt")]
@@ -49,10 +50,10 @@ def get_cl_cd(speed, alpha, folder="../prop/aero"):
     # snap to closest speed
     best_file = min(speed_map, key=lambda fn: abs(speed_map[fn] - speed))
     best_speed = speed_map[best_file]
-    
+
     path = os.path.join(folder, best_file)
     alphas, cls, cds = load_file(path)
-    
+
     if len(alphas) == 0:
         raise RuntimeError(f"No aerodynamic data found in: {path}")
 

@@ -12,12 +12,14 @@ class Drone:
         wing_area=0.8,
         thrust=150.0,
         battery_capacity_wh=500.0,
+        path = "../prop/aero"
     ):
         self.mass = mass
         self.v_thresh = v_thresh
         self.wing_area = wing_area
         self.thrust_max = thrust
         self.battery_capacity_wh = battery_capacity_wh
+        self.path = path
         self.reset()
 
     def reset(self):
@@ -36,7 +38,7 @@ class Drone:
         x, y = self.v_norm
         angle = np.arctan2(y, x)
         v_abs = np.linalg.norm(self.v_body)
-        cl, cd, _, _ = get_cl_cd(v_abs, angle)
+        cl, cd, _, _ = get_cl_cd(v_abs, angle, self.path)
         self.rho = rho
         self.cl = cl
         self.cd = cd

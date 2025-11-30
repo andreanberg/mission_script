@@ -12,32 +12,37 @@ class Debugger:
     def get_data(self, drone: Drone):
         self.drone = drone
         if self.args == None:
-            timedict = drone.__dict__
+            frame_dict = drone.__dict__
         else:
-            timedict = {}
+            frame_dict = {}
             for key in self.args:
                 if np.shape(key) == (2,):
-                    di = drone.__dict__
-                    timedict[key] = (di[key[0]], di[key[1]])
+                    x = drone.__dict__[key[0]]
+                    y = drone.__dict__[key[1]]
+                    value = np.array([x, y])
                 elif np.shape(key) == ():
-                    timedict[key] = drone.__dict__[key]
+                    value = drone.__dict__[key]
                 else:
                     raise ValueError(f'Key "{key}" incorrect shape')
-        self.data.append(timedict)
+                frame_dict[key] = value
+        self.data += [frame_dict]
 
     def format(self):
         self.table = {}
-        re = self.drone.__dict__ if self.args == None else self.args
-        for key in re:
+        for key in self.data[0].keys:
             self.table[key] = np.array([d[key] for d in self.data])
 
     def show_data(self):
+        #print(self.data)
         self.format()
+        #print(self.table)
         if self.args != None:
             plt.figure()
             for key in self.args:
                 if np.shape(key) == (2,) or np.shape(key) == ():
-                    x, y = self.table[key]
+                    # print(self.table[key])
+                    x, y = self.table[key][:, 0], self.table[key][:, 1]
+                    # print(f"X : {x, np.shape(x)} \n Y: {y, np.shape(y)} \n")
                     label = f"test"
                 else:
                     raise ValueError(f'Key "{key}" incorrect shape')
