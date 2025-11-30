@@ -43,17 +43,15 @@ class Debugger:
             if ncols * nrows >= plots:
                 break
             nrows += 1
-
-        figsize = tuple(np.array(figsize) * ncols)
-        fig, axs = plt.subplots(nrows, ncols, figsize=figsize)
+        figsize = (figsize[0] * ncols, figsize[1] * nrows)
+        fig, axs = plt.subplots(nrows, ncols, figsize=figsize, squeeze=False)
         return fig, axs
 
     def plot(self, table, fig, axs):
         if self.args == None:
             raise ValueError("No arguments given")
-        ran = range(max(np.shape(axs)))
-        print(len(np.shape(axs)))
-        for pos, key in zip(itertools.product(ran, repeat=2), self.args):
+        ran = range(max((list(np.shape(axs)) + [1])[0:2]))
+        for (px,py), key in zip(itertools.product(ran, repeat=2), self.args):
             x, y = table[key][:, 0], table[key][:, 1]
             if np.shape(key) == ():
                 label = f'Drone: "{key}"'
@@ -61,11 +59,8 @@ class Debugger:
                 label = f'Drone: "{key[0]}" vs "{key[1]}'
             else:
                 raise ValueError(f'Key "{key}" incorrect shape')
-            print(pos)
-            
-            
-            axs[pos[0], pos[1]].plot(x, y, label=label)
-            axs[pos[0], pos[1]].legend()
+            axs[px, py].plot(x, y, label=label)
+            axs[px, py].legend()
 
         plt.tight_layout()
         plt.show()
