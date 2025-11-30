@@ -19,13 +19,13 @@ def main():
     # Take-off simulation with debugger
     args = [
         "pos",  # (2,) - plottable
-        #("t", "battery_wh"),  # (2,) - plottable
-        # ("pos", "v_body") # (2,2)
+        ("t", "battery_wh"),  # (2,) - plottable
+        # ("pos", "v_body") # (2,2) TODO
         # plottable with vector TODO perhaps every 100th
     ]
     debug = Debugger(args=args)
     sim.run(Takeoff(runway_length=20, debugger=debug))
-    #debug.show_data()
+    debug.show_data(size=(5,8))
     
 if __name__ == '__main__':
     main()

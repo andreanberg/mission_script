@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
+import copy
 from drone import Drone
+import itertools
 import matplotlib.pyplot as plt
 
 
@@ -10,45 +12,65 @@ class Debugger:
         self.args = args
 
     def get_data(self, drone: Drone):
-        self.drone = drone
+        data = drone.__dict__
         if self.args == None:
-            frame_dict = drone.__dict__
+            frame = data
         else:
-            frame_dict = {}
+            frame = {}
             for key in self.args:
                 if np.shape(key) == (2,):
-                    x = drone.__dict__[key[0]]
-                    y = drone.__dict__[key[1]]
-                    value = np.array([x, y])
+                    value = np.array([data[key[0]], data[key[1]]])
                 elif np.shape(key) == ():
-                    value = drone.__dict__[key]
+                    value = data[key]
                 else:
                     raise ValueError(f'Key "{key}" incorrect shape')
-                frame_dict[key] = value
-        self.data += [frame_dict]
+                frame[key] = value
+        self.data.append(copy.deepcopy(frame))
 
     def format(self):
-        self.table = {}
-        for key in self.data[0].keys:
-            self.table[key] = np.array([d[key] for d in self.data])
+        table = {}
+        for key in self.data[0]:
+            table[key] = np.array([d[key] for d in self.data])
+        return table
 
-    def show_data(self):
-        #print(self.data)
-        self.format()
-        #print(self.table)
+    def figsize(self, figsize):  # TODO
+        if self.args == None:
+            raise ValueError("No arguments given")
+        plots = len(self.args)
+        ncols, nrows = 1, 1
+        while ncols * nrows < plots:
+            ncols += 1
+            if ncols * nrows >= plots:
+                break
+            nrows += 1
+
+        figsize = tuple(np.array(figsize) * ncols)
+        fig, axs = plt.subplots(nrows, ncols, figsize=figsize)
+        return fig, axs
+
+    def plot(self, table, fig, axs):
+        if self.args == None:
+            raise ValueError("No arguments given")
+        ran = range(max(np.shape(axs)))
+        print(np.append(np.shape(axs), 0)[0:2])
+        for pos, key in zip(itertools.product(ran, repeat=2), self.args):
+            x, y = table[key][:, 0], table[key][:, 1]
+            if np.shape(key) == ():
+                label = f'Drone "{key}" space'
+            elif np.shape(key) == (2,):
+                label = f'Drone "{key[0]}" vs "{key[1]}'
+            else:
+                raise ValueError(f'Key "{key}" incorrect shape')
+            print(pos)
+            axs[pos[0], None].plot(x, y, label=label)
+            axs[pos[0], pos[1]].legend()
+
+        plt.tight_layout()
+        plt.show()
+        plt.figure()
+
+    def show_data(self, size):
+        table = self.format()
         if self.args != None:
-            plt.figure()
-            for key in self.args:
-                if np.shape(key) == (2,) or np.shape(key) == ():
-                    # print(self.table[key])
-                    x, y = self.table[key][:, 0], self.table[key][:, 1]
-                    # print(f"X : {x, np.shape(x)} \n Y: {y, np.shape(y)} \n")
-                    label = f"test"
-                else:
-                    raise ValueError(f'Key "{key}" incorrect shape')
-                plt.plot(x, y, label=label)
-            plt.legend()
-            plt.xlabel("x")
-            plt.ylabel("y")
-            plt.title("Debugger plots")
-            plt.show()
+            fig, axs = self.figsize(size)
+            self.plot(table, fig, axs)
