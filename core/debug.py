@@ -33,7 +33,7 @@ class Debugger:
             table[key] = np.array([d[key] for d in self.data])
         return table
 
-    def figsize(self, figsize):  # TODO
+    def mesh(self, figsize):  # TODO
         if self.args == None:
             raise ValueError("No arguments given")
         plots = len(self.args)
@@ -47,27 +47,28 @@ class Debugger:
         fig, axs = plt.subplots(nrows, ncols, figsize=figsize, squeeze=False)
         return fig, axs
 
-    def plot(self, table, fig, axs):
+    def plot(self, table, axs, color):
         if self.args == None:
             raise ValueError("No arguments given")
         ran = range(max((list(np.shape(axs)) + [1])[0:2]))
-        for (px,py), key in zip(itertools.product(ran, repeat=2), self.args):
-            x, y = table[key][:, 0], table[key][:, 1]
+        for (x_pos, y_pos), key in zip(itertools.product(ran, repeat=2), self.args):
+            x_values = table[key][:, 0]
+            y_values = table[key][:, 1]
             if np.shape(key) == ():
                 label = f'Drone: "{key}"'
             elif np.shape(key) == (2,):
-                label = f'Drone: "{key[0]}" vs "{key[1]}'
+                label = f'Drone: "{key[0]}" vs "{key[1]}"'
             else:
                 raise ValueError(f'Key "{key}" incorrect shape')
-            axs[px, py].plot(x, y, label=label)
-            axs[px, py].legend()
+            axs[x_pos, y_pos].plot(x_values, y_values, label=label, color=color)
+            axs[x_pos, y_pos].legend()
 
         plt.tight_layout()
         plt.show()
         plt.figure()
 
-    def show_data(self, size):
+    def show_data(self, size, color="Black"):
         table = self.format()
         if self.args != None:
-            fig, axs = self.figsize(size)
-            self.plot(table, fig, axs)
+            _, axs = self.mesh(size)
+            self.plot(table, axs, color)

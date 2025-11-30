@@ -16,12 +16,12 @@ def main():
     args = [
         ("t", "battery_wh"),
         "pos",
-        #("t", "battery_wh"),
-        #"pos",
+        ("t", "battery_wh"),
+        "pos",
     ]
     debug = Debugger(args=args)
     sim.run(Takeoff(runway_length=20, debugger=debug))
-    debug.show_data(size=(5, 3))
+    debug.show_data(size=(5, 3), color="Black")
 
 
 if __name__ == "__main__":
