@@ -52,17 +52,19 @@ class Debugger:
         if self.args == None:
             raise ValueError("No arguments given")
         ran = range(max(np.shape(axs)))
-        print(np.append(np.shape(axs), 0)[0:2])
+        print(len(np.shape(axs)))
         for pos, key in zip(itertools.product(ran, repeat=2), self.args):
             x, y = table[key][:, 0], table[key][:, 1]
             if np.shape(key) == ():
-                label = f'Drone "{key}" space'
+                label = f'Drone: "{key}"'
             elif np.shape(key) == (2,):
-                label = f'Drone "{key[0]}" vs "{key[1]}'
+                label = f'Drone: "{key[0]}" vs "{key[1]}'
             else:
                 raise ValueError(f'Key "{key}" incorrect shape')
             print(pos)
-            axs[pos[0], None].plot(x, y, label=label)
+            
+            
+            axs[pos[0], pos[1]].plot(x, y, label=label)
             axs[pos[0], pos[1]].legend()
 
         plt.tight_layout()
