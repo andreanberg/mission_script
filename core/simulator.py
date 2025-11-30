@@ -71,3 +71,27 @@ class Takeoff(Mission):
 
     def on_start(self, sim: Sim):
         sim.drone.takeoff = False
+
+
+class Climb(Mission):
+    def __init__(self, climb_angle, altitude_goal, analyzer: Analyzer | None = None):
+        super().__init__(analyzer=analyzer)
+        self.climb_angle = climb_angle
+        self.altitude_goal = altitude_goal
+
+    def simulate_condition(self, sim: Sim):
+        drone = sim.drone
+        return (not drone.climbed) and (drone.pos[1] < self.altitude_goal)
+
+    def success_check(self, sim: Sim):
+        if sim.drone.pos[1] >= self.altitude_goal:
+            sim.drone.climbed = True
+            return True
+        return False
+    
+    def on_step(self, sim: Sim):
+        
+        print(sim.drone.compute_forces(sim.env.rho)[1])
+
+    def on_start(self, sim: Sim):
+        sim.drone.takeoff = False

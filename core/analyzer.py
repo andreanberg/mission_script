@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import pandas as pd
 import numpy as np
 import itertools
 import copy
@@ -51,8 +50,8 @@ class Analyzer:
     def plot(self, table, axs, color):
         if self.args == None:
             raise ValueError("No arguments given")
-        ran = range(max((list(np.shape(axs)) + [1])[0:2]))
-        for (x_pos, y_pos), key in zip(itertools.product(ran, repeat=2), self.args):
+        ran = range(max((np.shape(axs))))
+        for (row, col), key in zip(itertools.product(ran, repeat=2), self.args):
             x_values = table[key][:, 0]
             y_values = table[key][:, 1]
             if np.shape(key) == ():
@@ -61,8 +60,8 @@ class Analyzer:
                 label = f'Drone: "{key[0]}" vs "{key[1]}"'
             else:
                 raise ValueError(f'Key "{key}" incorrect shape')
-            axs[x_pos, y_pos].plot(x_values, y_values, label=label, color=color)
-            axs[x_pos, y_pos].legend()
+            axs[row, col].plot(x_values, y_values, label=label, color=color)
+            axs[row, col].legend()
 
         plt.tight_layout()
         plt.show()
@@ -73,8 +72,3 @@ class Analyzer:
         if self.args != None:
             _, axs = self.mesh(size)
             self.plot(table, axs, color)
-
-# TODO measure time and iterations, give some sort of presentation of this in the show
-# TODO more in depth analysis of what is going on in the script: 
-# TODO other way around of collecting data, recording everything 
-# and scraping after, good for jupyter
