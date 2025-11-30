@@ -1,12 +1,13 @@
-import numpy as np
-import pandas as pd
-import copy
-from drone import Drone
-import itertools
 import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import itertools
+import copy
+
+from drone import Drone
 
 
-class Debugger:
+class Analyzer:
     def __init__(self, args=None):
         self.data = []
         self.args = args
@@ -33,7 +34,7 @@ class Debugger:
             table[key] = np.array([d[key] for d in self.data])
         return table
 
-    def mesh(self, figsize):  # TODO
+    def mesh(self, figsize):
         if self.args == None:
             raise ValueError("No arguments given")
         plots = len(self.args)
@@ -72,3 +73,8 @@ class Debugger:
         if self.args != None:
             _, axs = self.mesh(size)
             self.plot(table, axs, color)
+
+# TODO measure time and iterations, give some sort of presentation of this in the show
+# TODO more in depth analysis of what is going on in the script: 
+# TODO other way around of collecting data, recording everything 
+# and scraping after, good for jupyter

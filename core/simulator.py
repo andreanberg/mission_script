@@ -1,7 +1,7 @@
 import numpy as np
 import time
 
-from debug import Debugger
+from analyzer import Analyzer
 from drone import Drone
 from environment import Env
 
@@ -17,8 +17,8 @@ class Sim:
 
 
 class Mission:
-    def __init__(self, debugger: Debugger | None = None):
-        self.debugger = debugger
+    def __init__(self, analyzer: Analyzer | None = None):
+        self.analyzer = analyzer
 
     def on_start(self, sim: Sim):
         pass
@@ -36,8 +36,8 @@ class Mission:
         raise NotImplementedError
 
     def log(self, drone: Drone):
-        if self.debugger != None:
-            self.debugger.get_data(drone)
+        if self.analyzer != None:
+            self.analyzer.get_data(drone)
 
     def run(self, sim: Sim):
         self.on_start(sim)
@@ -55,8 +55,8 @@ class Mission:
 
 
 class Takeoff(Mission):
-    def __init__(self, runway_length, debugger: Debugger | None = None):
-        super().__init__(debugger=debugger)
+    def __init__(self, runway_length, analyzer: Analyzer | None = None):
+        super().__init__(analyzer=analyzer)
         self.runway_length = runway_length
 
     def simulate_condition(self, sim: Sim):

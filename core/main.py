@@ -1,9 +1,10 @@
 # Necessary imports
 import numpy as np
+
 from drone import Drone
 from environment import Env
 from simulator import Sim, Takeoff
-from debug import Debugger
+from analyzer import Analyzer
 
 
 def main():
@@ -13,15 +14,10 @@ def main():
     sim = Sim(drone=drone, env=env, dt=0.01)
 
     # Take-off simulation with debugger
-    args = [
-        ("t", "battery_wh"),
-        "pos",
-        ("t", "battery_wh"),
-        "pos",
-    ]
-    debug = Debugger(args=args)
-    sim.run(Takeoff(runway_length=20, debugger=debug))
-    debug.show_data(size=(5, 3), color="Black")
+    args = [("t", "battery_wh"), "pos"]
+    an_to = Analyzer(args=args)
+    sim.run(Takeoff(runway_length=20, analyzer=an_to))
+    an_to.show_data(size=(5, 3), color="Black")
 
 
 if __name__ == "__main__":
