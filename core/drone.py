@@ -2,6 +2,7 @@ import numpy as np
 import time
 import os
 from scrape import get_cl_cd
+from control import PIDController
 
 
 class Drone:
@@ -32,6 +33,9 @@ class Drone:
         self.th_vec = np.array([0.0, 0.0])
         self.f_vec = np.array([0.0, 0.0])
 
+        self.climb_pid = PIDController()
+        self.cruise_pid = PIDController()
+
         self.takeoff = False
         self.climbed = False
         self.cruised = False
@@ -47,8 +51,7 @@ class Drone:
         self.cl = cl
         self.cd = cd
 
-    @property
-    def weight(self):
+    def weight_vec(self):
         return np.array([0.0, -self.mass * 9.81])
 
     @property
@@ -63,10 +66,6 @@ class Drone:
     @property
     def v_low(self):
         return np.linalg.norm(self.v_body) < self.v_thresh
-
-    @property
-    def thrust(self):
-        return self.thrust_max
 
     def lift_vec(self):
         v_abs = np.linalg.norm(self.v_body)
@@ -88,11 +87,13 @@ class Drone:
         return -drag_abs * self.v_norm
 
     def thrust_vec(self):
-        # den här är helt fel, man borde ha en vinkel på planet och helt
-        # separat planets hastighet, det är ju möjligt att inte åka helt i
-        # linje med planet
-
-        # from other (dummy) - simon brask må veta vilken thrust
+        # PID
+        dt = 0.1
+        if self.takeoff:
+            angle = self.climb_pid.sensor(self.pos[0], self.pos[1])
+            self.thrust = self.climb_pid.update(angle, dt)
+        else:
+            self.thrust = self.thrust_max
         return self.thrust * self.v_norm
 
     def power_required(self):
@@ -112,13 +113,14 @@ class Drone:
         self.li_vec = self.lift_vec()
         self.dr_vec = self.drag_vec()
         self.th_vec = self.thrust_vec()
+        self.weight = self.weight_vec()
         self.f_vec = self.li_vec + self.dr_vec + self.th_vec + self.weight
         return self.f_vec
 
     def step(self, env, force_vec, dt):
         self.v_body += force_vec / self.mass * dt
         env.ground_constraint(self)
-        # env.climb_constraint(self) TODO
+
         self.pos += self.v_body * dt
         self.t += dt
         power = self.power_required()

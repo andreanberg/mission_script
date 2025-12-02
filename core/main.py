@@ -21,20 +21,23 @@ def main():
         ("t", "battery_wh"),
         "pos",
     ]
-    
-    print_args = [
-        "li_vec", 
-        "dr_vec",
-        "th_vec", 
-        "f_vec",
-        "pos"
-    ]    
-    
-    an_to = Analyzer(vis_args=vis_args, print_args=print_args)
-    sim.run(Takeoff(runway_length=20, analyzer=an_to))
-    sim.run(Climb(climb_angle=15, altitude_goal=1, analyzer=an_to))
 
-    an_to.show_data(size=(5, 3), color="Black")
+    an_to = Analyzer(vis_args=vis_args)
+    sim.run(Takeoff(runway_length=20, analyzer=an_to))
+    #an_to.show_data(size=(5, 3), color="Black")
+
+    print_args = [
+        "li_vec",
+        "dr_vec",
+        "th_vec",
+        "weight",
+        "f_vec",
+        "pos",
+    ]
+
+    an_cl = Analyzer(print_args=print_args)
+    sim.run(Climb(altitude_goal=100, analyzer=an_cl))
+    an_cl.show_data(size=(5, 3), color="Black")
 
 
 if __name__ == "__main__":

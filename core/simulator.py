@@ -71,12 +71,14 @@ class Takeoff(Mission):
 
     def on_start(self, sim: Sim):
         sim.drone.takeoff = False
+        
+    def on_end(self, sim: Sim):
+        sim.drone.takeoff = True
 
 
 class Climb(Mission):
-    def __init__(self, climb_angle, altitude_goal, analyzer: Analyzer | None = None):
+    def __init__(self, altitude_goal, analyzer: Analyzer | None = None):
         super().__init__(analyzer=analyzer)
-        self.climb_angle = climb_angle
         self.altitude_goal = altitude_goal
 
     def simulate_condition(self, sim: Sim):
@@ -94,4 +96,4 @@ class Climb(Mission):
         #print(sim.drone.compute_forces(sim.env.rho)[1])
 
     def on_start(self, sim: Sim):
-        sim.drone.takeoff = False
+        sim.drone.climbed = False
