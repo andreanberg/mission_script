@@ -1,23 +1,26 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import itertools
+import time
 import copy
+import os
 
 from drone import Drone
 
 
 class Analyzer:
-    def __init__(self, args=None):
+    def __init__(self, vis_args=None, print_args=None):
         self.data = []
-        self.args = args
+        self.vis_args = vis_args
+        self.print_args = print_args
 
     def get_data(self, drone: Drone):
-        data = drone.__dict__
-        if self.args == None:
-            frame = data
+        if self.vis_args == None:
+            frame = data = drone.__dict__
         else:
             frame = {}
-            for key in self.args:
+            data = drone.__dict__
+            for key in self.vis_args:
                 if np.shape(key) == (2,):
                     value = np.array([data[key[0]], data[key[1]]])
                 elif np.shape(key) == ():
@@ -27,6 +30,17 @@ class Analyzer:
                 frame[key] = value
         self.data.append(copy.deepcopy(frame))
 
+        if self.print_args != None:
+            data = drone.__dict__
+            for key in self.print_args:
+                if np.shape(key) == ():
+                    print(f"{key}:    \t {np.round(data[key], 3)}")
+                else:
+                    raise ValueError(f'Key "{key}" incorrect shape')
+            time.sleep(0.01)
+            os.system('clear')
+            print()
+
     def format(self):
         table = {}
         for key in self.data[0]:
@@ -34,9 +48,9 @@ class Analyzer:
         return table
 
     def mesh(self, figsize):
-        if self.args == None:
+        if self.vis_args == None:
             raise ValueError("No arguments given")
-        plots = len(self.args)
+        plots = len(self.vis_args)
         ncols, nrows = 1, 1
         while ncols * nrows < plots:
             ncols += 1
@@ -48,10 +62,10 @@ class Analyzer:
         return fig, axs
 
     def plot(self, table, axs, color):
-        if self.args == None:
+        if self.vis_args == None:
             raise ValueError("No arguments given")
         ran = range(max((np.shape(axs))))
-        for (row, col), key in zip(itertools.product(ran, repeat=2), self.args):
+        for (row, col), key in zip(itertools.product(ran, repeat=2), self.vis_args):
             x_values = table[key][:, 0]
             y_values = table[key][:, 1]
             if np.shape(key) == ():
@@ -69,6 +83,6 @@ class Analyzer:
 
     def show_data(self, size, color="Black"):
         table = self.format()
-        if self.args != None:
+        if self.vis_args != None:
             _, axs = self.mesh(size)
             self.plot(table, axs, color)

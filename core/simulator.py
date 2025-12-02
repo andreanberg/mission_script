@@ -90,8 +90,8 @@ class Climb(Mission):
         return False
     
     def on_step(self, sim: Sim):
-        
-        print(sim.drone.compute_forces(sim.env.rho)[1])
+        pass
+        #print(sim.drone.compute_forces(sim.env.rho)[1])
 
     def on_start(self, sim: Sim):
         sim.drone.takeoff = False

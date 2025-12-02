@@ -12,7 +12,7 @@ class Drone:
         wing_area=0.8,
         thrust=150.0,
         battery_capacity_wh=500.0,
-        path = "../prop/aero"
+        path="../prop/aero",
     ):
         self.mass = mass
         self.v_thresh = v_thresh
@@ -27,6 +27,10 @@ class Drone:
         self.v_body = np.array([0.0, 0.0])
         self.t = 0.0
         self.battery_wh = getattr(self, "battery_capacity_wh", 0.0)
+        self.li_vec = np.array([0.0, 0.0])
+        self.dr_vec = np.array([0.0, 0.0])
+        self.th_vec = np.array([0.0, 0.0])
+        self.f_vec = np.array([0.0, 0.0])
 
         self.takeoff = False
         self.climbed = False
@@ -105,9 +109,10 @@ class Drone:
 
     def compute_forces(self, rho):
         self.update_values(rho)
-        self.li_vec, self.dr_vec = self.lift_vec(), self.drag_vec()
-        self.th_vec, self.w_vec = self.thrust_vec(), self.weight
-        self.f_vec = self.li_vec + self.dr_vec + self.th_vec + self.w_vec
+        self.li_vec = self.lift_vec()
+        self.dr_vec = self.drag_vec()
+        self.th_vec = self.thrust_vec()
+        self.f_vec = self.li_vec + self.dr_vec + self.th_vec + self.weight
         return self.f_vec
 
     def step(self, env, force_vec, dt):
