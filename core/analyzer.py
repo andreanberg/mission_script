@@ -1,11 +1,19 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import itertools
+import platform
 import time
 import copy
 import os
 
 from drone import Drone
+
+class Plot:
+    def __init__(self, key_2d=None):
+        
+        
+        pass
+        
 
 
 class Analyzer:
@@ -38,7 +46,12 @@ class Analyzer:
                 else:
                     raise ValueError(f'Key "{key}" incorrect shape')
             time.sleep(0.01)
-            os.system('clear')
+            if platform.system() == "Windows":
+                os.system('cls')
+            else:
+                os.system('clear')
+
+            
             print()
 
     def format(self):
@@ -79,7 +92,6 @@ class Analyzer:
 
         plt.tight_layout()
         plt.show()
-        plt.figure()
 
     def show_data(self, size, color="Black"):
         table = self.format()
