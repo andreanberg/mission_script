@@ -12,7 +12,7 @@ class Drone:
         v_thresh=1e-6,
         wing_area=0.8,
         thrust=150.0,
-        battery_capacity_wh=500.0,
+        battery_capacity_wh=5000.0,
         path="../prop/aero",
     ):
         self.mass = mass

@@ -8,12 +8,19 @@ import os
 
 from drone import Drone
 
-class Plot:
-    def __init__(self, key_2d=None):
-        
-        
-        pass
-        
+
+class Point:
+    def __init__(
+        self,
+        key,
+        data: tuple | None = None,
+        interpolants: int | None = None,
+        normalized = False,
+    ):
+        self.key = key
+        self.data = data
+        self.interpolants = interpolants
+        self.normalized = normalized
 
 
 class Analyzer:
@@ -47,11 +54,10 @@ class Analyzer:
                     raise ValueError(f'Key "{key}" incorrect shape')
             time.sleep(0.01)
             if platform.system() == "Windows":
-                os.system('cls')
+                os.system("cls")
             else:
-                os.system('clear')
+                os.system("clear")
 
-            
             print()
 
     def format(self):
@@ -79,7 +85,7 @@ class Analyzer:
             raise ValueError("No arguments given")
         ran = range(max((np.shape(axs))))
         for (row, col), key in zip(itertools.product(ran, repeat=2), self.vis_args):
-            x_values = table[key][:, 0]
+            x_values = table[key][:, 0] 
             y_values = table[key][:, 1]
             if np.shape(key) == ():
                 label = f'Drone: "{key}"'

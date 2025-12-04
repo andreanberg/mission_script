@@ -4,7 +4,7 @@ import numpy as np
 from drone import Drone
 from environment import Env
 from simulator import Sim, Takeoff, Climb
-from analyzer import Analyzer
+from analyzer import Analyzer, Point
 
 
 def main():
@@ -19,6 +19,8 @@ def main():
 
     vis_args = [
         ("t", "battery_wh"),
+        #("pos", "f_vec", 10),
+        #("pos", "f_vec", 10),
         "pos",
     ]
 
@@ -35,8 +37,8 @@ def main():
         "pos",
     ]
 
-    an_cl = Analyzer(print_args=print_args)
-    sim.run(Climb(altitude_goal=100, analyzer=an_cl))
+    an_cl = Analyzer(vis_args=vis_args)#,print_args=print_args)
+    sim.run(Climb(altitude_goal=20, analyzer=an_cl))
     an_cl.show_data(size=(5, 3), color="Black")
 
 
@@ -57,4 +59,4 @@ if __name__ == "__main__":
 
 # TODO have a setting that gives all the forces in real-time (also motivates vector plotting)
 
-#
+
