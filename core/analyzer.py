@@ -36,27 +36,27 @@ class Point:
 
 
 class Analyzer:
-    def __init__(self, vis_args=None, print_args=None):
+    def __init__(self, vis_points=None, print_args=None):
         self.data = []
-        self.vis_args = vis_args
+        self.vis_points = vis_points
         self.print_args = print_args
 
     def get_data(self, drone: Drone):
-        # If vis_args is None we capture the full drone state; otherwise
+        # If vis_points is None we capture the full drone state; otherwise
         # require that every vis_arg is a Point and collect the referenced fields.
-        if self.vis_args is None:
+        if self.vis_points is None:
             frame = data = drone.__dict__
         else:
             # validate that only Points are present
-            for v in self.vis_args:
+            for v in self.vis_points:
                 if not isinstance(v, Point):
                     raise ValueError(
-                        "All entries in vis_args must be `Point` instances"
+                        "All entries in vis_points must be `Point` instances"
                     )
 
             frame = {}
             data = drone.__dict__
-            for k in self.vis_args:
+            for k in self.vis_points:
                 key = k.key
                 # primary key may be a 2-tuple (x,y) or a single field
                 if np.shape(key) == (2,):
@@ -95,9 +95,9 @@ class Analyzer:
         return table
 
     def mesh(self, figsize):
-        if self.vis_args == None:
+        if self.vis_points == None:
             raise ValueError("No arguments given")
-        plots = len(self.vis_args)
+        plots = len(self.vis_points)
         ncols, nrows = 1, 1
         while ncols * nrows < plots:
             ncols += 1
@@ -109,18 +109,18 @@ class Analyzer:
         return fig, axs
 
     def plot(self, table, axs, color):
-        if self.vis_args == None:
+        if self.vis_points == None:
             raise ValueError("No arguments given")
         ran = range(max((np.shape(axs))))
         # validate all are Points (defensive)
-        for v in self.vis_args:
+        for v in self.vis_points:
             if not isinstance(v, Point):
                 raise ValueError(
-                    "All entries in vis_args must be `Point` instances for plotting"
+                    "All entries in vis_points must be `Point` instances for plotting"
                 )
 
-        # iterate through subplots and vis_args in order
-        for (row, col), vis in zip(itertools.product(ran, repeat=2), self.vis_args):
+        # iterate through subplots and vis_points in order
+        for (row, col), vis in zip(itertools.product(ran, repeat=2), self.vis_points):
             ax = axs[row, col]
             key = vis.key
             # construct label
@@ -193,6 +193,6 @@ class Analyzer:
 
     def show_data(self, size, color="Black"):
         table = self.format()
-        if self.vis_args != None:
+        if self.vis_points != None:
             _, axs = self.mesh(size)
             self.plot(table, axs, color)
