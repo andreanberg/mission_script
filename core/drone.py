@@ -32,6 +32,7 @@ class Drone:
         self.dr_vec = np.array([0.0, 0.0])
         self.th_vec = np.array([0.0, 0.0])
         self.f_vec = np.array([0.0, 0.0])
+        self.weight = np.array([0.0, 0.0])
 
         self.climb_pid = PIDController()
         self.cruise_pid = PIDController()
