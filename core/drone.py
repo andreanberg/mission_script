@@ -3,6 +3,7 @@ import time
 import os
 from scrape import get_cl_cd
 from control import PIDController
+from control import sensor
 
 
 class Drone:
@@ -12,7 +13,7 @@ class Drone:
         v_thresh=1e-6,
         wing_area=0.8,
         thrust=150.0,
-        battery_capacity_wh=5000.0,
+        battery_capacity_wh=500.0,
         path="../prop/aero",
     ):
         self.mass = mass
@@ -32,10 +33,16 @@ class Drone:
         self.dr_vec = np.array([0.0, 0.0])
         self.th_vec = np.array([0.0, 0.0])
         self.f_vec = np.array([0.0, 0.0])
-        self.weight = np.array([0.0, 0.0])
 
-        self.climb_pid = PIDController()
+        self.climb_pid = PIDController(Kp=0.24,
+        Ki=0.8,
+        Kd=0.00008,
+        target_angle=20,
+        output_limits=(0, 10000),
+        tau=0.05,
+        max_angle=20)
         self.cruise_pid = PIDController()
+        self.angle = sensor
 
         self.takeoff = False
         self.climbed = False
@@ -89,9 +96,9 @@ class Drone:
 
     def thrust_vec(self):
         # PID
-        dt = 0.1
+        dt = 0.001
         if self.takeoff:
-            angle = self.climb_pid.sensor(self.pos[0], self.pos[1])
+            angle = self.angle(self.pos[0], self.pos[1])
             self.thrust = self.climb_pid.update(angle, dt)
         else:
             self.thrust = self.thrust_max

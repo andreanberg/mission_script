@@ -5,10 +5,10 @@ import numpy as np
 class PIDController:
     def __init__(
         self,
-        Kp=1,
+        Kp=1.0,
         Ki=0.5,
         Kd=0.01,
-        target_angle=15.0,
+        target_angle=0,
         output_limits=(0, 500),
         tau=0.05,
         max_angle=20,
@@ -72,23 +72,26 @@ class PIDController:
         self.old_value = measured_angle
         return new_thrust  # return a new thrust for our desired angle
 
-    def sensor(self, x, y):
-        # a simulated sensor that meassures the current angle
-        current_angle = np.arctan2(y, x)
-        current_angle = np.clip(
-            current_angle, -self.max_angle, self.max_angle
-        )  # limit our angle between some reasnoable value
+def sensor(x, y):
+    # a simulated sensor that meassures the current angle
+    
+    current_angle = np.arctan2(y, x)
 
-        if -0.001 < current_angle < 0.001:  # low error near 0 angle
-            sigma = 0
-        else:
-            sigma = 0.015  # 1.5% fault to simulate a sensor meassurment error
+    current_angle = np.rad2deg(np.arctan2(y, x))
+    current_angle = np.clip(
+        current_angle, -20, 20
+    )  # limit our angle between some reasnoable value
 
-        # to have a standrad diviated angle fault
-        noise = np.random.normal(
-            -(sigma / 2 * abs(current_angle)), sigma / 2 * abs(current_angle)
-        )
+    if -0.001 < current_angle < 0.001:  # low error near 0 angle
+        sigma = 0
+    else:
+        sigma = 0.015  # 1.5% fault to simulate a sensor meassurment error
 
-        return (
-            current_angle + noise
-        )  # a small meassure error for our angle meassurement
+    # to have a standrad diviated angle fault
+    noise = np.random.normal(
+        -(sigma / 2 * abs(current_angle)), sigma / 2 * abs(current_angle)
+    )
+
+    return (
+        current_angle + noise
+    )  # a small meassure error for our angle meassurement

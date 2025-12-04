@@ -19,7 +19,7 @@ def main():
 
     vis_points = [
         Point(key=("t", "battery_wh")),
-        Point(key="pos", data=("f_vec",), interpolants=10, normalized=False),
+        Point(key="pos", data=("f_vec",), interpolants=20, normalized=True),
     ]
     
     print_args = [
@@ -37,7 +37,7 @@ def main():
     #an_to.show_data(size=(5, 3), color="Black")
     
     #an_cl = Analyzer(print_args=print_args)
-    sim.run(Climb(altitude_goal=20, analyzer=an_to))
+    sim.run(Climb(altitude_goal=100, analyzer=an_to))
     an_to.show_data(size=(5, 3), color="Black")
 
 
