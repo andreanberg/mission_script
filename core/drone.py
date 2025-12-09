@@ -34,13 +34,15 @@ class Drone:
         self.th_vec = np.array([0.0, 0.0])
         self.f_vec = np.array([0.0, 0.0])
 
-        self.climb_pid = PIDController(Kp=0.24,
-        Ki=0.8,
-        Kd=0.00008,
-        target_angle=20,
-        output_limits=(0, 10000),
-        tau=0.05,
-        max_angle=20)
+        self.climb_pid = PIDController(
+            Kp=0.24,
+            Ki=0.8,
+            Kd=0.00008,
+            target_angle=20,
+            output_limits=(0, 10000),
+            tau=0.05,
+            max_angle=20,
+        )
         self.cruise_pid = PIDController()
         self.angle = sensor
 
@@ -95,13 +97,11 @@ class Drone:
         return -drag_abs * self.v_norm
 
     def thrust_vec(self):
-        # PID
-        dt = 0.001
         if self.takeoff:
-            angle = self.angle(self.pos[0], self.pos[1])
-            self.thrust = self.climb_pid.update(angle, dt)
+            self.thrust = self.control_throttle()
         else:
             self.thrust = self.thrust_max
+        
         return self.thrust * self.v_norm
 
     def power_required(self):
@@ -133,3 +133,20 @@ class Drone:
         self.t += dt
         power = self.power_required()
         self.consume_energy(power, dt)
+
+    def control_throttle(self, target_alpha=15):
+        x, y = self.v_body
+        current_alpha = np.rad2deg(np.atan2(y, x))
+        print(current_alpha)
+        if current_alpha >= 2 * target_alpha:
+            raise RuntimeError("Too big alpha, implement solution")
+        ratio = 1 + (target_alpha - current_alpha) / target_alpha
+        print(ratio)
+        
+        new_f = ratio * self.f_vec
+        abs_f = np.linalg.norm(new_f)
+        
+        if abs_f > self.thrust_max:
+            new_f = self.thrust_max * self.v_norm
+        
+        return new_f

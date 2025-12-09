@@ -37,7 +37,7 @@ def main():
     #an_to.show_data(size=(5, 3), color="Black")
     
     #an_cl = Analyzer(print_args=print_args)
-    sim.run(Climb(altitude_goal=100, analyzer=an_to))
+    sim.run(Climb(altitude_goal=10, analyzer=an_to))
     an_to.show_data(size=(5, 3), color="Black")
 
 
