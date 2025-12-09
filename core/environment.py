@@ -11,6 +11,3 @@ class Env:
         if not drone.takeoff:
             drone.pos[1] = 0.0
             drone.v_body[1] = 0.0
-
-    def climb_constraint(self, drone: Drone, angle):
-        pass

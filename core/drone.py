@@ -2,8 +2,7 @@ import numpy as np
 import time
 import os
 from scrape import get_cl_cd
-from control import PIDController
-from control import sensor
+import copy
 
 
 class Drone:
@@ -22,7 +21,7 @@ class Drone:
         self.thrust_max = thrust
         self.battery_capacity_wh = battery_capacity_wh
         self.path = path
-        self.reset()
+        self.angle = None
 
     def reset(self):
         self.pos = np.array([0.0, 0.0])
@@ -33,18 +32,7 @@ class Drone:
         self.dr_vec = np.array([0.0, 0.0])
         self.th_vec = np.array([0.0, 0.0])
         self.f_vec = np.array([0.0, 0.0])
-
-        self.climb_pid = PIDController(
-            Kp=0.24,
-            Ki=0.8,
-            Kd=0.00008,
-            target_angle=20,
-            output_limits=(0, 10000),
-            tau=0.05,
-            max_angle=20,
-        )
-        self.cruise_pid = PIDController()
-        self.angle = sensor
+        self.angle = None
 
         self.takeoff = False
         self.climbed = False
@@ -97,12 +85,35 @@ class Drone:
         return -drag_abs * self.v_norm
 
     def thrust_vec(self):
-        if self.takeoff:
-            self.thrust = self.control_throttle()
+        if self.takeoff or self.climbed:
+            thrust = self.calculate_thrust()
         else:
-            self.thrust = self.thrust_max
-        
-        return self.thrust * self.v_norm
+            thrust = self.thrust_max
+        return thrust * self.v_norm
+
+    def calculate_thrust(self):
+        dr = copy.deepcopy(self)
+        w_vec = self.weight_vec()
+        th_vec = self.thrust_max
+        v_body = self.v_body
+
+        interpolants = 100
+        for v_ratio in np.linspace(1, 0, interpolants):
+            dr.v_body = v_body * v_ratio
+            for thrust_ratio in np.linspace(0, 1, interpolants):
+                li_vec = dr.lift_vec()
+                dr_vec = dr.drag_vec()
+                f_vec = li_vec + dr_vec + th_vec * thrust_ratio + w_vec
+                x, y = f_vec
+                print(self.angle, x, y) # TODO here ALSKDJFASLDJKFÖALKSDJFÖLASJDFÖLKJASÖDLJFAÖLSKDJFÖLAJSDFÖLKJ
+                time.sleep(0.2)
+                # print(np.rad2deg(np.atan2(y, x)))
+                # time.sleep(0.001)
+                # print(self.angle, np.rad2deg(np.atan2(y,x)))
+                if self.angle >= np.rad2deg(np.atan2(y, x)):
+                    pass
+                #    return drone.th_vec
+        raise RuntimeError(f"Could not find thrust for angle {self.angle}")
 
     def power_required(self):
         if self.v_low:
@@ -127,26 +138,8 @@ class Drone:
 
     def step(self, env, force_vec, dt):
         self.v_body += force_vec / self.mass * dt
-        env.ground_constraint(self)
-
+        env.ground_constraint(self)  # place angle constraint here
         self.pos += self.v_body * dt
         self.t += dt
         power = self.power_required()
         self.consume_energy(power, dt)
-
-    def control_throttle(self, target_alpha=15):
-        x, y = self.v_body
-        current_alpha = np.rad2deg(np.atan2(y, x))
-        print(current_alpha)
-        if current_alpha >= 2 * target_alpha:
-            raise RuntimeError("Too big alpha, implement solution")
-        ratio = 1 + (target_alpha - current_alpha) / target_alpha
-        print(ratio)
-        
-        new_f = ratio * self.f_vec
-        abs_f = np.linalg.norm(new_f)
-        
-        if abs_f > self.thrust_max:
-            new_f = self.thrust_max * self.v_norm
-        
-        return new_f

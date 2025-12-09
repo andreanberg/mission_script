@@ -17,11 +17,21 @@ class Sim:
 
 
 class Mission:
-    def __init__(self, analyzer: Analyzer | None = None):
+    def __init__(self, angle, analyzer: Analyzer | None = None):
         self.analyzer = analyzer
+        self.angle = angle
 
     def on_start(self, sim: Sim):
-        pass
+        x = np.cos(np.deg2rad(self.angle))
+        y = np.sin(np.deg2rad(self.angle))
+        sim.drone.angle = self.angle
+        #print("b", sim.drone.v_body)
+        sim.drone.v_body = np.linalg.norm(sim.drone.v_body) * np.array([x, y])
+        #print("a", sim.drone.v_body)
+        sim.drone.th_vec = np.linalg.norm(sim.drone.f_vec) * np.array([x, y])
+        # print(sim.drone.f_vec)
+        sim.drone.compute_forces(sim.env.rho)
+        # print("s", sim.drone.f_vec)
 
     def on_step(self, sim: Sim):
         pass
@@ -55,8 +65,8 @@ class Mission:
 
 
 class Takeoff(Mission):
-    def __init__(self, runway_length, analyzer: Analyzer | None = None):
-        super().__init__(analyzer=analyzer)
+    def __init__(self, runway_length, angle, analyzer: Analyzer | None = None):
+        super().__init__(angle=angle, analyzer=analyzer)
         self.runway_length = runway_length
 
     def simulate_condition(self, sim: Sim):
@@ -69,16 +79,13 @@ class Takeoff(Mission):
             return True
         return False
 
-    def on_start(self, sim: Sim):
-        sim.drone.takeoff = False
-        
     def on_end(self, sim: Sim):
         sim.drone.takeoff = True
 
 
 class Climb(Mission):
-    def __init__(self, altitude_goal, analyzer: Analyzer | None = None):
-        super().__init__(analyzer=analyzer)
+    def __init__(self, altitude_goal, angle, analyzer: Analyzer | None = None):
+        super().__init__(angle=angle, analyzer=analyzer)
         self.altitude_goal = altitude_goal
 
     def simulate_condition(self, sim: Sim):
@@ -90,10 +97,7 @@ class Climb(Mission):
             sim.drone.climbed = True
             return True
         return False
-    
+
     def on_step(self, sim: Sim):
         pass
-        #print(sim.drone.compute_forces(sim.env.rho)[1])
-
-    def on_start(self, sim: Sim):
-        sim.drone.climbed = False
+        # print(sim.drone.compute_forces(sim.env.rho)[1])

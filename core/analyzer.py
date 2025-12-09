@@ -8,6 +8,7 @@ import os
 
 from drone import Drone
 
+# TODO fix from gpt sludge
 
 class Point:
     def __init__(
@@ -80,7 +81,7 @@ class Analyzer:
                     print(f"{key}:    \t {np.round(data[key], 3)}")
                 else:
                     raise ValueError(f'Key "{key}" incorrect shape')
-            time.sleep(0.01)
+            time.sleep(1)
             if platform.system() == "Windows":
                 os.system("cls")
             else:
@@ -90,8 +91,11 @@ class Analyzer:
 
     def format(self):
         table = {}
-        for key in self.data[0]:
-            table[key] = np.array([d[key] for d in self.data])
+        try:
+            for key in self.data[0]:
+                table[key] = np.array([d[key] for d in self.data])
+        except:
+            raise ValueError(f"No data inside {self}")
         return table
 
     def mesh(self, figsize):
