@@ -86,7 +86,8 @@ class Drone:
 
     def thrust_vec(self):
         if self.takeoff or self.climbed:
-            thrust = self.calculate_thrust()
+            thrust = 0.5 * self.thrust_max
+            #thrust = self.calculate_thrust()
         else:
             thrust = self.thrust_max
         return thrust * self.v_norm
@@ -98,15 +99,16 @@ class Drone:
         v_body = self.v_body
 
         interpolants = 100
-        for v_ratio in np.linspace(1, 0, interpolants):
+        for v_ratio in np.linspace(0, 1, interpolants):
             dr.v_body = v_body * v_ratio
             for thrust_ratio in np.linspace(0, 1, interpolants):
                 li_vec = dr.lift_vec()
                 dr_vec = dr.drag_vec()
                 f_vec = li_vec + dr_vec + th_vec * thrust_ratio + w_vec
                 x, y = f_vec
-                print(self.angle, x, y) # TODO here ALSKDJFASLDJKFÖALKSDJFÖLASJDFÖLKJASÖDLJFAÖLSKDJFÖLAJSDFÖLKJ
-                time.sleep(0.2)
+                f_vec_angle = np.rad2deg(np.atan((y/x)))
+                print(self.angle, f_vec_angle, "\t" ) # TODO here ALSKDJFASLDJKFÖALKSDJFÖLASJDFÖLKJASÖDLJFAÖLSKDJFÖLAJSDFÖLKJ
+                time.sleep(0.01)
                 # print(np.rad2deg(np.atan2(y, x)))
                 # time.sleep(0.001)
                 # print(self.angle, np.rad2deg(np.atan2(y,x)))

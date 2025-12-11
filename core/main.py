@@ -16,11 +16,11 @@ def main():
     )
 
     env = Env(air_density=1.225)
-    sim = Sim(drone=drone, env=env, dt=0.01)
+    sim = Sim(drone=drone, env=env, dt=0.1)
 
     vis_points = [
-        #Point(key=("t", "battery_wh")),
-        Point(key="pos", data=("f_vec",), interpolants=20, normalized=True),
+        Point(key=("t", "battery_wh")),
+        Point(key="pos", data=("f_vec", "weight"), interpolants=20, normalized=True),
     ]
 
     print_args = [
@@ -34,15 +34,15 @@ def main():
 
     vis_an_to = Analyzer(vis_points=vis_points)
     print_an_to = Analyzer(print_args=print_args)
-    
+
     vis_an_cl = Analyzer(vis_points=vis_points)
     print_an_cl = Analyzer(print_args=print_args)
-    
+
     sim.run(Takeoff(angle=0, runway_length=20, analyzer=vis_an_to))
-    sim.run(Climb(angle=5, altitude_goal=10, analyzer=vis_an_to))
-    
-    vis_an_to.show_data(size=(5, 3), color="Black")
-    #vis_an_cl.show_data(size=(5, 3), color="Black")
+    sim.run(Climb(angle=5, altitude_goal=1, analyzer=vis_an_to))
+
+    vis_an_to.show_data(size=(5, 3), color=("Black", "Red", "Blue"))
+    # vis_an_cl.show_data(size=(5, 3), color="Black")
 
 
 if __name__ == "__main__":

@@ -10,6 +10,7 @@ from drone import Drone
 
 # TODO fix from gpt sludge
 
+
 class Point:
     def __init__(
         self,
@@ -20,14 +21,6 @@ class Point:
         color: str | None = None,
         linewidth: float | None = None,
     ):
-        """Represents a plotting item.
-
-        - key: the primary variable name (string) or a tuple of two names (for x vs y pairs)
-        - data: when present, names of additional fields to use for plotting (e.g. vector field names)
-        - interpolants: for vector plotting, number of arrows to draw along the trajectory
-        - normalized: whether to normalize vector lengths when plotting
-        - color, linewidth: optional appearance controls for plotting
-        """
         self.key = key
         self.data = data
         self.interpolants = interpolants
@@ -43,12 +36,9 @@ class Analyzer:
         self.print_args = print_args
 
     def get_data(self, drone: Drone):
-        # If vis_points is None we capture the full drone state; otherwise
-        # require that every vis_arg is a Point and collect the referenced fields.
         if self.vis_points is None:
             frame = data = drone.__dict__
         else:
-            # validate that only Points are present
             for v in self.vis_points:
                 if not isinstance(v, Point):
                     raise ValueError(
@@ -112,90 +102,87 @@ class Analyzer:
         fig, axs = plt.subplots(nrows, ncols, figsize=figsize, squeeze=False)
         return fig, axs
 
-    def plot(self, table, axs, color):
+    def plot(self, table, axs, colors):
         if self.vis_points == None:
             raise ValueError("No arguments given")
         ran = range(max((np.shape(axs))))
-        # validate all are Points (defensive)
         for v in self.vis_points:
             if not isinstance(v, Point):
                 raise ValueError(
                     "All entries in vis_points must be `Point` instances for plotting"
                 )
+        if len(colors) == 0:
+            colors = ("Black",) * len(self.vis_points)
+        elif len(colors) == 1:
+            colors = (colors[0],) * len(self.vis_points)
+        else:
+            colors = colors + (colors[-1],) * len(self.vis_points)
 
-        # iterate through subplots and vis_points in order
         for (row, col), vis in zip(itertools.product(ran, repeat=2), self.vis_points):
             ax = axs[row, col]
             key = vis.key
-            # construct label
             if isinstance(key, tuple) and len(key) == 2:
                 label = f'Drone: "{key[0]}" vs "{key[1]}"'
             else:
                 label = f'Drone: "{key}"'
-
-            # Always plot the key (trajectory) as a continuous line/curve
             arr = table[key]
             if hasattr(arr, "ndim") and arr.ndim == 2 and arr.shape[1] >= 2:
                 x_values = arr[:, 0]
                 y_values = arr[:, 1]
-                ax.plot(x_values, y_values, label=label, color=(vis.color or color))
+                ax.plot(x_values, y_values, label=label, color=colors[0])
             else:
-                # fall back to plotting scalar over index
                 ax.plot(
                     np.arange(arr.shape[0]),
                     arr,
                     label=label,
-                    color=(vis.color or color),
+                    color=colors[0],
                 )
-
-            # If data is provided, plot vectors only at interpolant sample points
             if vis.data is not None:
                 pos_arr = table[key]
-                vec_name = vis.data[0]
-                vec_arr = table[vec_name]
-                T = pos_arr.shape[0]
-                n_arrows = vis.interpolants or min(20, T)
-                if n_arrows <= 0:
-                    n_arrows = min(20, T)
-                indices = np.linspace(0, T - 1, n_arrows, dtype=int)
+                for data, color in zip(vis.data, colors[1:]):
+                    
+                    vec_arr = table[data]
+                    T = pos_arr.shape[0]
+                    n_arrows = vis.interpolants or min(20, T)
+                    if n_arrows <= 0:
+                        n_arrows = min(20, T)
+                    indices = np.linspace(0, T - 1, n_arrows, dtype=int)
+                    xs = pos_arr[indices, 0]
+                    ys = pos_arr[indices, 1]
+                    us = vec_arr[indices, 0]
+                    vs = vec_arr[indices, 1]
 
-                # project to 2D (x,y)
-                xs = pos_arr[indices, 0]
-                ys = pos_arr[indices, 1]
-                us = vec_arr[indices, 0]
-                vs = vec_arr[indices, 1]
+                    # normalize optionally
+                    if vis.normalized:
+                        norms = np.linalg.norm(np.stack((us, vs), axis=1), axis=1)
+                        norms[norms == 0] = 1.0
+                        us = us / norms
+                        vs = vs / norms
+                        scale = 1.0
+                    else:
+                        # choose a scale that keeps arrows visible; using data units
+                        scale = 1.0
 
-                # normalize optionally
-                if vis.normalized:
-                    norms = np.linalg.norm(np.stack((us, vs), axis=1), axis=1)
-                    norms[norms == 0] = 1.0
-                    us = us / norms
-                    vs = vs / norms
-                    scale = 1.0
-                else:
-                    # choose a scale that keeps arrows visible; using data units
-                    scale = 1.0
-
-                ax.scatter(xs, ys, color=(vis.color or color), s=6)
-                ax.quiver(
-                    xs,
-                    ys,
-                    us,
-                    vs,
-                    angles="xy",
-                    scale_units="xy",
-                    scale=scale,
-                    color=(vis.color or color),
-                    width=0.004,
-                )
-                ax.set_aspect("equal", adjustable="datalim")
+                    ax.scatter(xs, ys, color=color, s=6)
+                    ax.quiver(
+                        xs,
+                        ys,
+                        us,
+                        vs,
+                        angles="xy",
+                        scale_units="xy",
+                        scale=scale,
+                        color=(vis.color or color),
+                        width=0.002,
+                    )
+                    ax.set_aspect("equal", adjustable="datalim")
 
             ax.legend()
 
         plt.tight_layout()
         plt.show()
 
-    def show_data(self, size, color="Black"):
+    def show_data(self, size, color=("Black",)):
         table = self.format()
         if self.vis_points != None:
             _, axs = self.mesh(size)
