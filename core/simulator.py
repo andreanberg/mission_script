@@ -25,13 +25,9 @@ class Mission:
         x = np.cos(np.deg2rad(self.angle))
         y = np.sin(np.deg2rad(self.angle))
         sim.drone.angle = self.angle
-        #print("b", sim.drone.v_body)
         sim.drone.v_body = np.linalg.norm(sim.drone.v_body) * np.array([x, y])
-        #print("a", sim.drone.v_body)
         sim.drone.th_vec = np.linalg.norm(sim.drone.f_vec) * np.array([x, y])
-        # print(sim.drone.f_vec)
         sim.drone.compute_forces(sim.env.rho)
-        # print("s", sim.drone.f_vec)
 
     def on_step(self, sim: Sim):
         pass
@@ -98,6 +94,19 @@ class Climb(Mission):
             return True
         return False
 
-    def on_step(self, sim: Sim):
-        pass
-        # print(sim.drone.compute_forces(sim.env.rho)[1])
+
+class Cruise(Mission):
+    def __init__(self, distance_goal, angle, analyzer: Analyzer | None = None):
+        super().__init__(angle=angle, analyzer=analyzer)
+        self.distance_goal = distance_goal
+        self.distance_traveled = 0
+
+    def simulate_condition(self, sim: Sim):
+        drone = sim.drone
+        return (not drone.cruised) and (self.distance_traveled < self.distance_goal)
+
+    def success_check(self, sim: Sim):
+        if self.distance_traveled < self.distance_goal:
+            sim.drone.cruised = True
+            return True
+        return False

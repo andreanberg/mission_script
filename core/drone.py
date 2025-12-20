@@ -4,6 +4,7 @@ import os
 from scrape import get_cl_cd
 import copy
 
+# TODO implement a great PID that removes occilations
 
 class Drone:
     def __init__(
@@ -25,6 +26,7 @@ class Drone:
         self.angle = None
 
     def reset(self):
+        # TODO necessary?
         self.pos = np.array([0.0, 0.0])
         self.v_body = np.array([0.0, 0.0])
         self.t = 0.0
@@ -43,6 +45,8 @@ class Drone:
         return self
 
     def update_values(self, rho):
+        # TODO generate a dataframe with all these values in the beginning
+        # have call functions to get the nearest cl, cd - steal from get_cl_cd
         x, y = self.v_norm
         angle = np.arctan2(y, x)
         v_abs = np.linalg.norm(self.v_body)
@@ -87,16 +91,20 @@ class Drone:
         return -drag_abs * self.v_norm
 
     def thrust_vec(self):
-        
         x, y = self.v_norm
-        
-        if np.rad2deg(np.atan2(y,x)) >= self.angle and self.takeoff:
-            thrust = 0
-        else:
-            thrust = self.thrust_max
-        return thrust * self.v_norm
+        self.start = False
+        angle = np.rad2deg(np.atan2(y,x))
+        if  angle >= self.angle and self.takeoff:
+            self.start = True
+        thrust_vec = self.thrust_max * self.v_norm
+        if self.start:
+            x_angle = np.cos(np.deg2rad(angle))
+            y_angle = np.sin(np.deg2rad(angle))
+            thrust_vec = 0.35 * thrust_vec * np.array([x_angle,y_angle])
+        return thrust_vec
 
     def calculate_thrust(self):
+        # TODO use a PID instead
         dr = copy.deepcopy(self)
         w_vec = self.weight_vec()
         th_vec = self.thrust_max

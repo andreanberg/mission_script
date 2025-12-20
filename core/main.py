@@ -1,15 +1,12 @@
-# Necessary imports
 import numpy as np
-
 from drone import Drone
 from environment import Env
-from simulator import Sim, Takeoff, Climb
+from simulator import Sim, Takeoff, Climb, Cruise
 from analyzer import Analyzer, Point
-
 
 def main():
     drone = Drone(
-        mass=6.0,
+        mass=5.0,
         wing_area=0.9,
         thrust=50.0,
         path="prop/aero",
@@ -19,12 +16,12 @@ def main():
     sim = Sim(drone=drone, env=env, dt=0.01)
 
     vis_points = [
-        #Point(key=("t", "battery_wh")),
-        #Point(dara = "weigth"),
+        # Point(key=("t", "battery_wh")),
+        # Point(dara = "weigth"),
         Point(
             key="pos",
             data=("f_vec", "li_vec", "dr_vec", "th_vec", "weight"),
-            interpolants=150,
+            interpolants=200,
             normalized=False,
         ),
     ]
@@ -42,13 +39,13 @@ def main():
     vis_an_to = Analyzer(vis_points=vis_points)
     print_an_to = Analyzer(print_args=print_args)
 
-    vis_an_cl = Analyzer(vis_points=vis_points)
-    print_an_cl = Analyzer(print_args=print_args)
-
     sim.run(Takeoff(angle=0, runway_length=20, analyzer=vis_an_to))
-    sim.run(Climb(angle=5, altitude_goal=50, analyzer=vis_an_to))
+    sim.run(Climb(angle=7, altitude_goal=100, analyzer=vis_an_to))
+    #sim.run(Cruise(angle=0, distance_goal=500, analyzer=vis_an_to))
 
-    vis_an_to.show_data(size=(5, 3), color=("Black", "Red", "Blue", "Green", "Purple", "Yellow"))
+    vis_an_to.show_data(
+        size=(5, 3), color=("Black", "Red", "Blue", "Green", "Purple", "Yellow")
+    )
     # vis_an_cl.show_data(size=(5, 3), color="Black")
 
 

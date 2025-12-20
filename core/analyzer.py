@@ -9,7 +9,8 @@ import os
 from drone import Drone
 
 # TODO fix from gpt sludge
-
+# TODO really needs to be rewritten 
+# from the ground up using pen and paper
 
 class Point:
     def __init__(
