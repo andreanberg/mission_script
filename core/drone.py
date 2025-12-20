@@ -3,7 +3,7 @@ import time
 import os
 from scrape import get_cl_cd
 import copy
-from control import PIDController
+
 
 class Drone:
     def __init__(
@@ -39,19 +39,6 @@ class Drone:
         self.takeoff = False
         self.climbed = False
         self.cruised = False
-        
-        self.climb_pid = PIDController()
-        self.climb_pid = PIDController(
-            Kp=0.24,
-            Ki=0.8,
-            Kd=0.00008,
-            target_angle=20,
-            output_limits=(0, 10000),
-            tau=0.05,
-            max_angle=20
-        )
-        self.cruise_pid = PIDController()
-        self.angle = sensor
 
         return self
 
@@ -100,16 +87,14 @@ class Drone:
         return -drag_abs * self.v_norm
 
     def thrust_vec(self):
-        dt = 0.1
-        dt = 0.001
-        if self.takeoff:
-            angle = self.climb_pid.sensor(self.pos[0], self.pos[1])
-            angle = self.angle(self.pos[0], self.pos[1])
-            self.thrust = self.climb_pid.update(angle, dt)
-
+        
+        x, y = self.v_norm
+        
+        if np.rad2deg(np.atan2(y,x)) >= self.angle and self.takeoff:
+            thrust = 0
         else:
-
-            self.thrust = self.thrust_max
+            thrust = self.thrust_max
+        return thrust * self.v_norm
 
     def calculate_thrust(self):
         dr = copy.deepcopy(self)

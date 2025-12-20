@@ -171,7 +171,7 @@ class Analyzer:
                         scale_units="xy",
                         scale=scale,
                         color=(vis.color or color),
-                        width=0.002,
+                        width=0.001,
                     )
                     ax.set_aspect("equal", adjustable="datalim")
 
