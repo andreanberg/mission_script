@@ -16,7 +16,7 @@ class Point:
         self,
         key,
         data: tuple | None = None,
-        interpolants: int | None = None,
+        interpolants: int = 20,
         normalized: bool = False,
         color: str | None = None,
         linewidth: float | None = None,
@@ -71,7 +71,7 @@ class Analyzer:
                     print(f"{key}:    \t {np.round(data[key], 3)}")
                 else:
                     raise ValueError(f'Key "{key}" incorrect shape')
-            time.sleep(1)
+            time.sleep(0.01)
             if platform.system() == "Windows":
                 os.system("cls")
             else:
@@ -143,9 +143,7 @@ class Analyzer:
                     
                     vec_arr = table[data]
                     T = pos_arr.shape[0]
-                    n_arrows = vis.interpolants or min(20, T)
-                    if n_arrows <= 0:
-                        n_arrows = min(20, T)
+                    n_arrows = vis.interpolants
                     indices = np.linspace(0, T - 1, n_arrows, dtype=int)
                     xs = pos_arr[indices, 0]
                     ys = pos_arr[indices, 1]
